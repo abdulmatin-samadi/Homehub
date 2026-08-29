@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}{% if object %}E'lonni tahrirlash{% else %}Yangi e'lon{% endif %} — HomeHub{% endblock %}
+
+{% block content %}
+<section class="form-page">
+    <h1>{% if object %}E'lonni tahrirlash{% else %}Yangi e'lon qo'shish{% endif %}</h1>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <div class="form-card">
+            <h3>Asosiy ma'lumotlar</h3>
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}
+                        <small class="form-error">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="form-card">
+            <h3>Qo'shimcha rasmlar</h3>
+            {{ image_formset.management_form }}
+            {% for image_form in image_formset %}
+                <div class="form-group">
+                    {{ image_form.image }}
+                    {% if image_form.instance.pk %}
+                        {{ image_form.DELETE }} <label>O'chirish</label>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn--primary">Saqlash</button>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}HomeHub — O'zbekistonda uy, kvartira va yer sotib oling yoki ijaraga bering{% endblock %}
+
+{% block content %}
+
+<!-- ===== HERO SECTION ===== -->
+<section class="hero">
+    <div class="hero__text">
+        <h1 class="hero__title">O'zingizga mos uyni <span>HomeHub</span> orqali toping</h1>
+        <p class="hero__subtitle">Sotiladigan va ijaraga beriladigan minglab e'lonlar — bir platformada</p>
+    </div>
+
+    <!-- ===== QIDIRUV FORMASI ===== -->
+    <form method="get" action="{% url 'properties:property_list' %}" class="search-box">
+        <div class="search-box__field">
+            <label for="region">Viloyat</label>
+            <select name="region" id="region">
+                <option value="">Barcha viloyatlar</option>
+                {% for value, label in regions %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="search-box__field">
+            <label for="deal_type">Turi</label>
+            <select name="deal_type" id="deal_type">
+                <option value="">Sotiladi / Ijaraga</option>
+                <option value="sale">Sotiladi</option>
+                <option value="rent">Ijaraga</option>
+            </select>
+        </div>
+
+        <div class="search-box__field search-box__field--grow">
+            <label for="q">Qidiruv</label>
+            <input type="text" name="q" id="q" placeholder="Manzil, tuman yoki kalit so'z...">
+        </div>
+
+        <button type="submit" class="btn btn--primary search-box__btn">Qidirish</button>
+    </form>
+    <p class="hero__note">Qidiruv natijalari "Barcha e'lonlar" sahifasida ko'rsatiladi.</p>
+</section>
+
+<!-- ===== PREMIUM UYLAR ===== -->
+<section class="section">
+    <div class="section__header">
+        <h2 class="section__title">Premium e'lonlar</h2>
+        <p class="section__subtitle">Eng saralangan va sifatli takliflar</p>
+    </div>
+
+    {% if premium_properties %}
+        <div class="property-grid">
+            {% for property in premium_properties %}
+                <a href="{{ property.get_absolute_url }}" class="property-card">
+                    <img src="{{ property.main_image.url }}" alt="{{ property.title }}" class="property-card__image">
+                    <div class="property-card__body">
+                        <h3>{{ property.title }}</h3>
+                        <p class="property-card__price">{{ property.price }} so'm</p>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>Hozircha premium e'lonlar mavjud emas.</p>
+            <span>Bu bo'lim 3-qadamda (Property) to'liq ishga tushadi.</span>
+        </div>
+    {% endif %}
+</section>
+
+<!-- ===== SO'NGGI E'LONLAR ===== -->
+<section class="section">
+    <div class="section__header">
+        <h2 class="section__title">So'nggi e'lonlar</h2>
+        <p class="section__subtitle">Yaqinda qo'shilgan uy va kvartiralar</p>
+    </div>
+
+    {% if latest_properties %}
+        <div class="property-grid">
+            {% for property in latest_properties %}
+                <a href="{{ property.get_absolute_url }}" class="property-card">
+                    <img src="{{ property.main_image.url }}" alt="{{ property.title }}" class="property-card__image">
+                    <div class="property-card__body">
+                        <h3>{{ property.title }}</h3>
+                        <p class="property-card__price">{{ property.price }} so'm</p>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>Hozircha e'lonlar qo'shilmagan.</p>
+            <span>Bu bo'lim 3-qadamda (Property) to'liq ishga tushadi.</span>
+        </div>
+    {% endif %}
+</section>
+
+{% endblock %}

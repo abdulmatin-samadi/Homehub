@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block title %}{{ property.title }} — HomeHub{% endblock %}
+
+{% block content %}
+<section class="detail-page">
+
+    <!-- ===== RASMLAR CAROUSEL ===== -->
+    <div class="detail-page__gallery">
+        <img src="{{ property.main_image.url }}" alt="{{ property.title }}" class="detail-page__main-image" id="mainImage">
+        {% if property.images.all %}
+            <div class="detail-page__thumbs">
+                <img src="{{ property.main_image.url }}" alt="{{ property.title }}" class="detail-page__thumb detail-page__thumb--active" onclick="setMainImage(this)">
+                {% for img in property.images.all %}
+                    <img src="{{ img.image.url }}" alt="{{ property.title }}" class="detail-page__thumb" onclick="setMainImage(this)">
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="detail-page__content">
+        <div class="detail-page__main">
+            <div class="detail-page__title-row">
+                <div>
+                    <span class="badge badge--{{ property.deal_type }}">{{ property.get_deal_type_display }}</span>
+                    <h1>{{ property.title }}</h1>
+                    <p class="detail-page__location">{{ property.get_region_display }}, {{ property.district }}, {{ property.address }}</p>
+                </div>
+                {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'favorites:toggle_favorite' property.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <button type="submit" class="favorite-btn favorite-btn--lg {% if is_favorited %}favorite-btn--active{% endif %}">♥</button>
+                    </form>
+                {% endif %}
+            </div>
+
+            {% if average_rating %}
+                <p class="rating-summary">★ {{ average_rating|floatformat:1 }} · {{ reviews|length }} ta sharh</p>
+            {% endif %}
+
+            <div class="detail-page__stats">
+                <div><strong>{{ property.area }} m²</strong><span>Maydon</span></div>
+                <div><strong>{{ property.rooms }}</strong><span>Xona</span></div>
+                <div><strong>{{ property.floor }}</strong><span>Qavat</span></div>
+                <div><strong>{{ property.year_built }}</strong><span>Qurilgan yil</span></div>
+                <div><strong>{{ property.get_condition_display }}</strong><span>Holati</span></div>
+            </div>
+
+            <h3>Tavsif</h3>
+            <p class="detail-page__description">{{ property.description|linebreaks }}</p>
+
+            <!-- ===== XARITA ===== -->
+            <h3>Manzil xaritada</h3>
+            {% if property.latitude and property.longitude %}
+                <iframe
+                    class="map-frame"
+                    src="https://www.openstreetmap.org/export/embed.html?bbox={{ property.longitude }}%2C{{ property.latitude }}%2C{{ property.longitude }}%2C{{ property.latitude }}&layer=mapnik&marker={{ property.latitude }}%2C{{ property.longitude }}"
+                    loading="lazy">
+                </iframe>
+            {% else %}
+                <div class="map-placeholder">Bu e'lon uchun xarita koordinatalari kiritilmagan</div>
+            {% endif %}
+
+            <!-- ===== SHARHLAR ===== -->
+            <h3>Sharhlar ({{ reviews|length }})</h3>
+            <div class="reviews-list">
+                {% for review in reviews %}
+                    <div class="review-card">
+                        <div class="review-card__header">
+                            <strong>{{ review.user.get_full_name|default:review.user.username }}</strong>
+                            <span class="review-card__stars">{% for i in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</span>
+                        </div>
+                        <p>{{ review.comment }}</p>
+                        <span class="review-card__date">{{ review.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                {% empty %}
+                    <p class="empty-state">Hali sharh yozilmagan. Birinchi bo'ling!</p>
+                {% endfor %}
+            </div>
+
+            {% if user.is_authenticated and not user_has_reviewed and user != property.owner %}
+                <form method="post" action="{% url 'reviews:add_review' property.pk %}" class="form-card">
+                    <h4>Sharh qoldirish</h4>
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>{{ review_form.rating.label }}</label>
+                        {{ review_form.rating }}
+                    </div>
+                    <div class="form-group">
+                        <label>{{ review_form.comment.label }}</label>
+                        {{ review_form.comment }}
+                    </div>
+                    <button type="submit" class="btn btn--primary">Yuborish</button>
+                </form>
+            {% endif %}
+        </div>
+
+        <div class="detail-page__sidebar">
+            <p class="detail-page__price">{{ property.price }} so'm</p>
+
+            <div class="owner-card">
+                <p class="owner-card__label">E'lon egasi</p>
+                <p class="owner-card__name">{{ property.owner.get_full_name|default:property.owner.username }}</p>
+                {% if property.owner.phone_number %}
+                    <a href="tel:{{ property.owner.phone_number }}" class="btn btn--secondary btn--block">📞 {{ property.owner.phone_number }}</a>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                    {% if user != property.owner %}
+                        <a href="{% url 'chat:start_conversation' property.pk %}" class="btn btn--primary btn--block">💬 Bog'lanish</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn--primary btn--block">Bog'lanish uchun kiring</a>
+                {% endif %}
+            </div>
+
+            {% if user == property.owner %}
+                <div class="owner-actions">
+                    <a href="{% url 'properties:property_update' property.pk %}" class="btn btn--secondary btn--block">Tahrirlash</a>
+                    <a href="{% url 'properties:property_delete' property.pk %}" class="btn btn--outline btn--block">O'chirish</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<script>
+    // Kichik carousel: kichik rasmga bosilganda katta rasmni almashtiradi
+    function setMainImage(thumb) {
+        document.getElementById('mainImage').src = thumb.src;
+        document.querySelectorAll('.detail-page__thumb').forEach(function (el) {
+            el.classList.remove('detail-page__thumb--active');
+        });
+        thumb.classList.add('detail-page__thumb--active');
+    }
+</script>
+{% endblock %}

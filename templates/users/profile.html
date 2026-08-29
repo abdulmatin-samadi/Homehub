@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Mening profilim — HomeHub{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+
+    <!-- ===== AVATAR BLOKI ===== -->
+    <div class="profile-card">
+        <img src="{{ user.avatar_url }}" alt="{{ user.username }}" class="profile-card__avatar">
+
+        <h2 class="profile-card__name">{{ user.get_full_name|default:user.username }}</h2>
+        <p class="profile-card__role">{{ user.get_role_display }}</p>
+
+        <form method="post" action="{% url 'users:avatar_upload' %}" enctype="multipart/form-data" class="avatar-form">
+            {% csrf_token %}
+            {{ avatar_form.avatar }}
+            <button type="submit" class="btn btn--secondary btn--block">Rasmni yangilash</button>
+        </form>
+
+        <a href="{% url 'users:password_change' %}" class="btn btn--outline btn--block">Parolni almashtirish</a>
+    </div>
+
+    <!-- ===== PROFIL MA'LUMOTLARI FORMASI ===== -->
+    <div class="profile-form-card">
+        <h3>Shaxsiy ma'lumotlar</h3>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}
+                        <small class="form-error">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn--primary">Saqlash</button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

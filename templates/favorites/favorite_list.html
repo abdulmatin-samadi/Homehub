@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Sevimlilar — HomeHub{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="section__header">
+        <h2 class="section__title">Sevimli e'lonlarim</h2>
+        <p class="section__subtitle">{{ favorites|length }} ta e'lon saqlangan</p>
+    </div>
+
+    {% if favorites %}
+        <div class="property-grid">
+            {% for fav in favorites %}
+                <a href="{{ fav.property.get_absolute_url }}" class="property-card">
+                    <img src="{{ fav.property.main_image.url }}" alt="{{ fav.property.title }}" class="property-card__image">
+                    <div class="property-card__body">
+                        <h3>{{ fav.property.title }}</h3>
+                        <p class="property-card__price">{{ fav.property.price }} so'm</p>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>Sevimlilar ro'yxati bo'sh.</p>
+            <span>Yoqtirgan e'lonlaringizni ♥ tugmasi orqali shu yerga qo'shing.</span>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

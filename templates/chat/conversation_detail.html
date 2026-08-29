@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}{{ conversation.listing.title }} — Suhbat — HomeHub{% endblock %}
+
+{% block content %}
+<section class="chat-page">
+    <div class="chat-page__header">
+        <a href="{{ conversation.listing.get_absolute_url }}">← {{ conversation.listing.title }}</a>
+    </div>
+
+    <div class="chat-page__messages">
+        {% for message in messages_list %}
+            <div class="chat-bubble {% if message.sender == request.user %}chat-bubble--mine{% endif %}">
+                <p>{{ message.text }}</p>
+                <span>{{ message.created_at|date:"d.m.Y H:i" }}</span>
+            </div>
+        {% empty %}
+            <p class="empty-state">Hali xabar yo'q. Birinchi xabarni siz yozing!</p>
+        {% endfor %}
+    </div>
+
+    <form method="post" class="chat-page__form">
+        {% csrf_token %}
+        {{ form.text }}
+        <button type="submit" class="btn btn--primary">Yuborish</button>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Xabarlar — HomeHub{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="section__header">
+        <h2 class="section__title">Xabarlarim</h2>
+    </div>
+
+    {% if conversations %}
+        <div class="chat-list">
+            {% for conv in conversations %}
+                <a href="{% url 'chat:conversation_detail' conv.pk %}" class="chat-list__item">
+                    <div>
+                        <strong>{{ conv.listing.title }}</strong>
+                        <p>
+                            {% if request.user == conv.buyer %}
+                                Sotuvchi: {{ conv.seller.get_full_name|default:conv.seller.username }}
+                            {% else %}
+                                Xaridor: {{ conv.buyer.get_full_name|default:conv.buyer.username }}
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% if conv.last_message %}
+                        <span class="chat-list__preview">{{ conv.last_message.text|truncatechars:40 }}</span>
+                    {% endif %}
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>Hozircha suhbatlaringiz yo'q.</p>
+            <span>E'lon sahifasidagi "Bog'lanish" tugmasi orqali suhbat boshlang.</span>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Boshqaruv paneli — HomeHub{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+    <div class="dashboard__header">
+        <h1>Xush kelibsiz, {{ request.user.get_full_name|default:request.user.username }}!</h1>
+        <div class="dashboard__stats">
+            <div class="dashboard__stat"><strong>{{ properties_count }}</strong><span>Mening e'lonlarim</span></div>
+            <div class="dashboard__stat"><strong>{{ favorites_count }}</strong><span>Sevimlilar</span></div>
+            <div class="dashboard__stat"><strong>{{ my_conversations|length }}</strong><span>Suhbatlar</span></div>
+        </div>
+    </div>
+
+    <!-- ===== MENING E'LONLARIM ===== -->
+    <div class="dashboard__section">
+        <div class="section__header section__header--row">
+            <h3>Mening e'lonlarim</h3>
+            <a href="{% url 'properties:property_create' %}" class="btn btn--primary">+ Yangi e'lon</a>
+        </div>
+        {% if my_properties %}
+            <div class="property-grid">
+                {% for property in my_properties %}
+                    <a href="{{ property.get_absolute_url }}" class="property-card">
+                        <img src="{{ property.main_image.url }}" alt="{{ property.title }}" class="property-card__image">
+                        <div class="property-card__body">
+                            <h3>{{ property.title }}</h3>
+                            <p class="property-card__price">{{ property.price }} so'm</p>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state"><p>Siz hali e'lon joylashtirmagansiz.</p></div>
+        {% endif %}
+    </div>
+
+    <!-- ===== SEVIMLILAR ===== -->
+    <div class="dashboard__section">
+        <div class="section__header section__header--row">
+            <h3>Sevimlilar</h3>
+            <a href="{% url 'favorites:favorite_list' %}" class="navbar__link">Barchasi →</a>
+        </div>
+        {% if my_favorites %}
+            <div class="property-grid">
+                {% for fav in my_favorites %}
+                    <a href="{{ fav.property.get_absolute_url }}" class="property-card">
+                        <img src="{{ fav.property.main_image.url }}" alt="{{ fav.property.title }}" class="property-card__image">
+                        <div class="property-card__body">
+                            <h3>{{ fav.property.title }}</h3>
+                            <p class="property-card__price">{{ fav.property.price }} so'm</p>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state"><p>Sevimlilar ro'yxati bo'sh.</p></div>
+        {% endif %}
+    </div>
+
+    <!-- ===== CHATLAR ===== -->
+    <div class="dashboard__section">
+        <div class="section__header section__header--row">
+            <h3>So'nggi suhbatlar</h3>
+            <a href="{% url 'chat:conversation_list' %}" class="navbar__link">Barchasi →</a>
+        </div>
+        {% if my_conversations %}
+            <div class="chat-list">
+                {% for conv in my_conversations %}
+                    <a href="{% url 'chat:conversation_detail' conv.pk %}" class="chat-list__item">
+                        <strong>{{ conv.listing.title }}</strong>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state"><p>Hali suhbatlaringiz yo'q.</p></div>
+        {% endif %}
+    </div>
+
+    <!-- ===== PROFIL ===== -->
+    <div class="dashboard__section">
+        <a href="{% url 'users:profile' %}" class="btn btn--outline">Profilni tahrirlash →</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HomeHub — Ko'chmas Mulk Platformasi{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <header class="navbar">
+        <div class="container navbar__inner">
+            <a href="{% url 'pages:home' %}" class="navbar__logo">Home<span>Hub</span></a>
+
+            <nav class="navbar__links">
+                <a href="{% url 'pages:home' %}" class="navbar__link">Bosh sahifa</a>
+                <a href="{% url 'properties:property_list' %}" class="navbar__link">E'lonlar</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'properties:property_create' %}" class="navbar__link">+ E'lon berish</a>
+                    <a href="{% url 'favorites:favorite_list' %}" class="navbar__link">Sevimlilar</a>
+                    <a href="{% url 'chat:conversation_list' %}" class="navbar__link">Xabarlar</a>
+                    <a href="{% url 'dashboard:dashboard' %}" class="navbar__link">Dashboard</a>
+                    <a href="{% url 'users:logout' %}" class="navbar__link navbar__link--btn">Chiqish</a>
+                {% else %}
+                    <a href="{% url 'users:login' %}" class="navbar__link">Kirish</a>
+                    <a href="{% url 'users:register' %}" class="navbar__link navbar__link--btn">Ro'yxatdan o'tish</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===== XABARLAR (messages) ===== -->
+    {% if messages %}
+        <div class="container">
+            {% for message in messages %}
+                <div class="alert alert--{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- ===== ASOSIY KONTENT ===== -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container footer__grid">
+            <div class="footer__col">
+                <a href="{% url 'pages:home' %}" class="navbar__logo">Home<span>Hub</span></a>
+                <p class="footer__about">O'zbekiston bo'ylab uy, kvartira, yer va tijorat ko'chmas
+                    mulklarini sotib olish yoki ijaraga berish uchun ishonchli platforma.</p>
+            </div>
+
+            <div class="footer__col">
+                <h4>Platforma</h4>
+                <a href="{% url 'pages:home' %}">Bosh sahifa</a>
+                <a href="{% url 'properties:property_list' %}">Barcha e'lonlar</a>
+                <a href="#">Qanday ishlaydi</a>
+            </div>
+
+            <div class="footer__col">
+                <h4>Foydalanuvchi</h4>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'users:profile' %}">Mening profilim</a>
+                {% else %}
+                    <a href="{% url 'users:login' %}">Kirish</a>
+                    <a href="{% url 'users:register' %}">Ro'yxatdan o'tish</a>
+                {% endif %}
+            </div>
+
+            <div class="footer__col">
+                <h4>Aloqa</h4>
+                <a href="tel:+998900000000">+998 90 000-00-00</a>
+                <a href="mailto:info@homehub.uz">info@homehub.uz</a>
+            </div>
+        </div>
+
+        <div class="container footer__bottom">
+            <p>&copy; {% now "Y" %} HomeHub — O'zbekiston uchun ko'chmas mulk platformasi.</p>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

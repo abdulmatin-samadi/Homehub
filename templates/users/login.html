@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Kirish — HomeHub{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <h1 class="auth-card__title">Tizimga kirish</h1>
+        <p class="auth-card__subtitle">Xush kelibsiz, yana ko'rishganimizdan xursandmiz</p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}
+                        <small class="form-error">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn--primary btn--block">Kirish</button>
+        </form>
+
+        <p class="auth-card__footer">
+            Hisobingiz yo'qmi? <a href="{% url 'users:register' %}">Ro'yxatdan o'ting</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

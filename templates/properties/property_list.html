@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}Barcha e'lonlar — HomeHub{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="section__header section__header--row">
+        <div>
+            <h2 class="section__title">Barcha e'lonlar</h2>
+            <p class="section__subtitle">{{ page_obj.paginator.count }} ta e'lon topildi</p>
+        </div>
+        {% if user.is_authenticated %}
+            <a href="{% url 'properties:property_create' %}" class="btn btn--primary">+ E'lon qo'shish</a>
+        {% endif %}
+    </div>
+
+    <div class="list-layout">
+        <!-- ===== FILTR PANELI ===== -->
+        <aside class="filter-panel">
+            <form method="get">
+                <h4>Filtr</h4>
+
+                <div class="form-group">
+                    <label for="q">Kalit so'z</label>
+                    <input type="text" name="q" id="q" value="{{ request_get.q|default:'' }}" placeholder="Sarlavha, manzil...">
+                </div>
+
+                <div class="form-group">
+                    <label for="region">Viloyat</label>
+                    <select name="region" id="region">
+                        <option value="">Barchasi</option>
+                        {% for value, label in regions %}
+                            <option value="{{ value }}" {% if request_get.region == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="deal_type">Turi</label>
+                    <select name="deal_type" id="deal_type">
+                        <option value="">Barchasi</option>
+                        <option value="sale" {% if request_get.deal_type == 'sale' %}selected{% endif %}>Sotiladi</option>
+                        <option value="rent" {% if request_get.deal_type == 'rent' %}selected{% endif %}>Ijaraga</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Narx oralig'i (so'm)</label>
+                    <div class="filter-panel__row">
+                        <input type="number" name="min_price" value="{{ request_get.min_price|default:'' }}" placeholder="Dan">
+                        <input type="number" name="max_price" value="{{ request_get.max_price|default:'' }}" placeholder="Gacha">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="rooms">Xonalar soni (kamida)</label>
+                    <input type="number" name="rooms" id="rooms" value="{{ request_get.rooms|default:'' }}" min="1">
+                </div>
+
+                <div class="form-group">
+                    <label>Maydon (m²)</label>
+                    <div class="filter-panel__row">
+                        <input type="number" name="min_area" value="{{ request_get.min_area|default:'' }}" placeholder="Dan">
+                        <input type="number" name="max_area" value="{{ request_get.max_area|default:'' }}" placeholder="Gacha">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn--primary btn--block">Filtrlash</button>
+                <a href="{% url 'properties:property_list' %}" class="btn btn--outline btn--block">Tozalash</a>
+            </form>
+        </aside>
+
+        <!-- ===== NATIJALAR ===== -->
+        <div class="list-layout__results">
+            {% if properties %}
+                <div class="property-grid">
+                    {% for property in properties %}
+                        <div class="property-card">
+                            <a href="{{ property.get_absolute_url }}">
+                                <img src="{{ property.main_image.url }}" alt="{{ property.title }}" class="property-card__image">
+                            </a>
+                            {% if user.is_authenticated %}
+                                <form method="post" action="{% url 'favorites:toggle_favorite' property.pk %}" class="favorite-btn-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                    <button type="submit" class="favorite-btn {% if property.pk in favorited_ids %}favorite-btn--active{% endif %}">♥</button>
+                                </form>
+                            {% endif %}
+                            <a href="{{ property.get_absolute_url }}" class="property-card__body">
+                                <span class="badge badge--{{ property.deal_type }}">{{ property.get_deal_type_display }}</span>
+                                <h3>{{ property.title }}</h3>
+                                <p class="property-card__price">{{ property.price }} so'm</p>
+                                <p class="property-card__meta">{{ property.get_region_display }}, {{ property.district }} · {{ property.rooms }} xona · {{ property.area }} m²</p>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if is_paginated %}
+                    <div class="pagination">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}">← Oldingi</a>
+                        {% endif %}
+                        <span>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}">Keyingi →</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <p>Hech qanday e'lon topilmadi.</p>
+                    <span>Filtrni o'zgartirib ko'ring yoki birinchi bo'lib e'lon joylashtiring.</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
