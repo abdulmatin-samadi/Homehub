@@ -1,77 +1,112 @@
-# HomeHub — O'zbekiston uchun Ko'chmas Mulk Platformasi
+HomeHub — Real Estate Platform for Uzbekistan
 
-To'liq Django loyihasi: Authentication, Property CRUD, Search/Filter,
-Favorites, Reviews, Chat, Dashboard, Admin panel va REST API.
+HomeHub is a Django-based real estate platform designed for users in Uzbekistan. Users can create property listings, search and filter properties, save favorites, leave reviews, and communicate with property owners.
 
-## O'rnatish
+Features
 
-```bash
-cd homehub
+* User registration, login, and profile management
+* Property listing creation, editing, viewing, and deletion
+* Property search and filtering
+* Favorites
+* Property reviews
+* Messaging between users
+* Personal dashboard
+* Django administration panel
+* REST API built with Django REST Framework
+* Optional map coordinates using OpenStreetMap
+
+Technologies
+
+* Python
+* Django
+* Django REST Framework
+* SQLite
+* HTML and CSS
+* Pillow
+
+Project Structure
+
+The project contains the following Django applications:
+
+Application	Purpose
+pages	Homepage
+users	User accounts and profiles
+properties	Property listings and search
+favorites	Saved properties
+reviews	Property reviews
+chat	User messaging
+dashboard	Personal dashboard
+payments	Premium listing payment management
+api	REST API
+
+Installation
+
+1. Clone the repository
+
+git clone https://github.com/abdulmatin-samadi/Homehub.git
+cd Homehub
+
+2. Create and activate a virtual environment
+
 python3 -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+source venv/bin/activate
+
+On Windows:
+
+venv\Scripts\activate
+
+3. Install dependencies
 
 python3 -m pip install --upgrade pip
 python3 -m pip install -r requirements.txt
 
-python manage.py makemigrations users properties favorites reviews chat payments
-python manage.py migrate
+4. Apply database migrations
 
-python manage.py createsuperuser
+python3 manage.py migrate
 
-python manage.py runserver
-```
+5. Create an administrator account
 
-Brauzerda: **http://127.0.0.1:8000/**
+python3 manage.py createsuperuser
 
-## Ilovalar va URL xaritasi
+6. Run the development server
 
-| App | URL prefiksi | Vazifasi |
-|---|---|---|
-| `pages` | `/` | Bosh sahifa (Hero, Search, Premium, So'nggi e'lonlar) |
-| `users` | `/users/` | Register, Login, Logout, Profile, Avatar, Parol |
-| `properties` | `/elonlar/` | E'lonlar ro'yxati, filtr, CRUD, tafsilot |
-| `favorites` | `/sevimlilar/` | Sevimlilar ro'yxati, ♥ toggle |
-| `reviews` | `/sharhlar/` | Sharh qo'shish (property detail sahifasidan) |
-| `chat` | `/xabarlar/` | Suhbatlar ro'yxati va yozishmalar |
-| `dashboard` | `/dashboard/` | Shaxsiy boshqaruv paneli |
-| `payments` | admin orqali | Premium e'lon uchun to'lov (hozircha admin tasdiqlaydi) |
-| `api` | `/api/` | REST API (DRF) — `/api/properties/` |
-| Admin | `/admin/` | To'liq boshqaruv paneli |
+python3 manage.py runserver
 
-## Muhim texnik izohlar
+Open http://127.0.0.1:8000/ in your browser.
 
-- **Custom User modeli** (`users.User`) — `phone_number`, `avatar`, `role`, `bio`.
-- **Property** modelida barcha talab qilingan maydonlar bor: sarlavha, tavsif,
-  narx, viloyat, tuman, manzil, maydon, xonalar, qavat, qurilgan yil, holati,
-  bitim turi, asosiy va qo'shimcha rasmlar, egasi. `latitude`/`longitude`
-  ixtiyoriy — kiritilsa, tafsilot sahifasida OpenStreetMap xaritasi chiqadi
-  (API kalit talab qilinmaydi).
-- **CRUD** to'liq Class-Based View'lar orqali (`ListView`, `DetailView`,
-  `CreateView`, `UpdateView`, `DeleteView`) — faqat e'lon egasi tahrirlash/
-  o'chirish huquqiga ega (`OwnerRequiredMixin`).
-- **Qidiruv/filtr**: `q`, `region`, `deal_type`, `min_price`, `max_price`,
-  `rooms`, `min_area`, `max_area` GET-parametrlari orqali (`/elonlar/?region=...`).
-- **Chat** — real-time (WebSocket) emas, oddiy sahifa yangilanishi asosida
-  ishlaydi. Real-time uchun kelajakda Django Channels qo'shish mumkin.
-- **Payments** — hozircha haqiqiy to'lov shlyuzi (Payme/Click) ulanmagan,
-  chunki bu API shartnoma/kalit talab qiladi. `Payment` modeli va admin
-  paneli orqali premium e'lonni qo'lda tasdiqlash infratuzilmasi tayyor —
-  keyinchalik haqiqiy shlyuz osongina ulanadi.
-- **REST API** — `djangorestframework` orqali, `/api/properties/` da to'liq
-  CRUD, faqat egasi o'zgartira oladi (`IsOwnerOrReadOnly`).
-- Sayt to'liq **o'zbek tilida**, dizayn Airbnb/Zillow/OLX uslubida,
-  responsive, rounded-card, hover-animatsiyali. Dark Mode uchun
-  `static/css/style.css` dagi CSS o'zgaruvchilari (`--bg-body`, `--text-body`)
-  tayyor.
+Main URLs
 
-## Tekshirish tartibi
+URL	Description
+/	Homepage
+/users/	User accounts
+/elonlar/	Property listings
+/sevimlilar/	Favorite properties
+/sharhlar/	Reviews
+/xabarlar/	Messages
+/dashboard/	Personal dashboard
+/api/properties/	Property REST API
+/admin/	Administration panel
 
-1. Ro'yxatdan o'ting → profilga avatar yuklang
-2. Yangi e'lon qo'shing (asosiy + qo'shimcha rasmlar, ixtiyoriy koordinata)
-3. Bosh sahifada va `/elonlar/` da ko'rinishini tekshiring
-4. Filtrlarni sinab ko'ring
-5. Boshqa hisob bilan kirib, ♥ bosing, sharh qoldiring, "Bog'lanish" orqali
-   xabar yozing
-6. `/dashboard/` da hammasi jamlanganini ko'ring
-7. `/admin/` orqali foydalanuvchilar, e'lonlar, sharhlar, chatlarni boshqaring
-# Homehub
+Testing
+
+Run the automated tests with:
+
+python3 manage.py test
+
+The project includes tests for the property model’s string representation and absolute URL generation.
+
+Implementation Notes
+
+* The project uses a custom user model, users.User.
+* Property owners can manage their own listings.
+* Property listings support optional geographic coordinates.
+* Messaging uses regular page requests rather than WebSockets.
+* The payment system currently supports administrative approval; a live Payme or Click payment gateway is not integrated.
+* The application uses SQLite by default.
+
+Future Improvements
+
+* Real-time messaging
+* Payment gateway integration
+* Additional automated tests
+* Production deployment and security configuration

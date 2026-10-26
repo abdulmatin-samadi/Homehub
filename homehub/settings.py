@@ -20,7 +20,9 @@ SECRET_KEY = 'django-insecure-CHANGE-THIS-KEY-IN-PRODUCTION-!!!'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']  # Production'da aniq domenlarni ko'rsating
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.github.dev',
+]
 
 # ============ APPLICATION DEFINITION ============
 INSTALLED_APPS = [
